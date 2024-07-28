@@ -6,7 +6,7 @@ ACCESSTOKEN =os.environ['ACCESS_TOKEN']
 SESSIONID =os.environ['SESSION_ID']
 CFCLEARANCE =os.environ['CF_CLEARANCE']
 
-MYACCESSTOKENS =list(filter(lambda s: bool(s), ",".split(',')))
+MYACCESSTOKENS =list(filter(lambda s: bool(s), os.environ['MYACCESSTOKENS'].split(',')))
 
 def main():
     udemy =Udemy(ACCESSTOKEN, SESSIONID, CFCLEARANCE, MYACCESSTOKENS)
