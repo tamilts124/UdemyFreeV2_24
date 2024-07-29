@@ -19,8 +19,11 @@ class CouponScraber:
         real_discount.collectcoupons_by_offerslink(real_discount.offers_link)
         self.coupon_datas =real_discount.coupons
 
-        # coursevania =Coursevania()
-        # coursevania.get_home_page_offerslink(from_day, to_day)
-        # coursevania.get_coupons_by_offerslink(coursevania.offers_link)
-        # self.combineUniqueLinks(coursevania.coupons)
+        try:
+            coursevania =Coursevania()
+            coursevania.get_home_page_offerslink(from_day, to_day)
+            coursevania.get_coupons_by_offerslink(coursevania.offers_link)
+            self.combineUniqueLinks(coursevania.coupons)
+        except Exception as e:
+            print("Coursevania offers cant fetch.")
 

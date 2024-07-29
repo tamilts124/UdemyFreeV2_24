@@ -1,4 +1,4 @@
-import requests
+import requests, json
 from bs4 import BeautifulSoup
 from threading import Thread
 from time import sleep
@@ -9,14 +9,23 @@ class Coursevania:
         self.offers_link =[]
         self.coupons =[]
 
+        #token
+        self.nonces ={}
+
         self.threads =0
         self.max_threads =max_threads
+        self.get_nonces()
+
+    def get_nonces(self):
+        course_page= requests.get("https://coursevania.com/courses/").text
+        cpage =list(filter(lambda e: "stm_lms_nonces" in e, course_page.split('<script>')))
+        if len(cpage)>0:
+            nonces =cpage[0].split('stm_lms_nonces =')[1].split(';')[0].strip()
+            self.nonces =json.loads(nonces)
 
     def get_home_page_offerslink(self, from_page:int, to_page:int):
         for index in range(from_page, to_page):
-            home_page =requests.get(f"https://coursevania.com/wp-admin/admin-ajax.php?offset={index}"+r"&args={%22image_size%22:%22250x250%22,%22per_row%22:%224%22,%22posts_per_page%22:%2212%22,%22class%22:%22archive_grid%22}&action=stm_lms_load_content&nonce=f0b5193a15&sort=date_high").json()
-            
-
+            home_page =requests.get(f"https://coursevania.com/wp-admin/admin-ajax.php?offset={index}"+r"&args={%22image_size%22:%22250x250%22,%22per_row%22:%224%22,%22posts_per_page%22:%2212%22,%22class%22:%22archive_grid%22}&action=stm_lms_load_content"+f"&nonce={self.nonces['load_content']}&sort=date_high").json()
             course_cards =BeautifulSoup(home_page['content'], 'html.parser').findAll('div', {'class': 'stm_lms_courses__single'})
             for card in course_cards:
                 h5_tag =card.find('h5')
