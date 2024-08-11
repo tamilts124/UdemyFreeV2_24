@@ -24,7 +24,7 @@ jobs:
       - name: Installing Requirements
         run: | 
           python -m pip install --upgrade pip
-          pip install bs4 requests
+          pip install -r requirements.txt
           
       - name: Running Script  
         env:
