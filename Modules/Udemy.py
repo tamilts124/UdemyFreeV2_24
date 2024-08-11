@@ -1,8 +1,8 @@
-import cloudscraper, json
+import cloudscraper, json, requests
 from threading import Thread
 from time import sleep
 
-requests =cloudscraper.CloudScraper()
+# requests =cloudscraper.CloudScraper()
 class Udemy:
     def __init__(self, accesstoken:str, sessionid:str, cfclearance:str, myaccesstokens:list=[], max_threads:int=5) -> None:
         self.max_threads =max_threads
@@ -59,8 +59,8 @@ class Udemy:
                 if not course_id: course_id =self.get_courseid_by_course_pagedata(requests.get(coupon_data[1]).text)
                 if not result_json: result_json =self.get_coupon_status(course_id, coupon_code)
                 if course_id: break
-            except Exception:
-                print('Udemy Prevention Detected.')
+            except Exception as e:
+                print(e, 'Udemy Prevention Detected.', )
                 pass
         if result_json and result_json.get('uses_remaining', ''):
             while True:

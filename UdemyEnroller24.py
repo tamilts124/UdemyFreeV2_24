@@ -1,6 +1,6 @@
 import os
 from Modules.Udemy import Udemy
-from CouponScraber import CouponScraber
+from CouponScraper import CouponScraper
 
 ACCESSTOKEN =os.environ['ACCESS_TOKEN']
 SESSIONID =os.environ['SESSION_ID']
@@ -28,7 +28,7 @@ def main():
         print("No coupons Availbales to Enroll.")
     else:
         status =udemy.enroll_courses(udemy.courses_cart)
-        print("Entroll Status:",status)
+        print("Entroll Status:","Success" if status else "Failed" )
 
 if __name__ == '__main__':
     main()
