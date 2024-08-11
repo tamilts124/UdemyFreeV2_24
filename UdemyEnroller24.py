@@ -11,7 +11,7 @@ MYACCESSTOKENS =list(filter(lambda s: bool(s), os.environ['MYACCESSTOKENS'].spli
 def main():
     udemy =Udemy(ACCESSTOKEN, SESSIONID, CFCLEARANCE, MYACCESSTOKENS)
     couponScraper =CouponScraper()
-    couponScraper.scrab(0, 1)
+    couponScraper.scrap(0, 1)
     coupon_datas =couponScraper.coupon_datas
 
     # print(coupon_datas[0:5])
