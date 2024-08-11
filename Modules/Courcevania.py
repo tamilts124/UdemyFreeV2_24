@@ -1,8 +1,10 @@
-import json
+import cloudscraper, json
 from bs4 import BeautifulSoup
 from threading import Thread
 from time import sleep
 
+
+requests =cloudscraper.CloudScraper()
 class Coursevania:
     def __init__(self, max_threads:int=5):
         # coursevania course page links

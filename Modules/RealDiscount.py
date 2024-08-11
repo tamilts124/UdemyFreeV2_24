@@ -1,7 +1,9 @@
-import requests
+import cloudscraper
 from bs4 import BeautifulSoup
 from threading import Thread
 from time import sleep
+
+requests =cloudscraper.CloudScraper()
 
 class RealDiscount:
 

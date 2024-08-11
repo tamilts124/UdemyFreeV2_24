@@ -1,8 +1,8 @@
-import requests, json
+import cloudscraper, json
 from threading import Thread
 from time import sleep
 
-
+requests =cloudscraper.CloudScraper()
 class Udemy:
     def __init__(self, accesstoken:str, sessionid:str, cfclearance:str, myaccesstokens:list=[], max_threads:int=5) -> None:
         self.max_threads =max_threads
@@ -11,8 +11,7 @@ class Udemy:
         self.accesstoken =accesstoken
         self.sessionid =sessionid
         self.cf_clearance =cfclearance
-        self.cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid, 'cf_clearance': self.cf_clearance}
-
+        self.cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid}
         # other udemy accounts access token
         self.myaccesstokens =myaccesstokens
         # freely buyable course cart list
