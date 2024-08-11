@@ -1,4 +1,4 @@
-import requests, json
+import json
 from bs4 import BeautifulSoup
 from threading import Thread
 from time import sleep
