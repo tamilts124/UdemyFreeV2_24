@@ -1,7 +1,7 @@
 from Modules.RealDiscount import RealDiscount
 from Modules.Courcevania import Coursevania
 
-class CouponScraber:
+class CouponScraper:
     def __init__(self) -> None:
         # coupons will be a list of [title, course_coupon]
         self.coupon_datas =[]
@@ -12,7 +12,7 @@ class CouponScraber:
                 if data[1]==coupon_data[1]: break
             else: self.coupon_datas.append(coupon_data)
 
-    def scrab(self, from_day:str, to_day:str):
+    def scrap(self, from_day:str, to_day:str):
         real_discount =RealDiscount()
         real_discount.get_articles_link()
         real_discount.get_offerslink_by_articleslink(real_discount.articles_link[from_day:to_day])
