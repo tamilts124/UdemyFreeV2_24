@@ -18,7 +18,7 @@ class CouponScraper:
             else: self.coupon_datas.append(coupon_data)
 
     def scrap(self, from_day:str, to_day:str):
-        proxyScraper =ProxyScraper(test_url='https://courson.xyz/coupons', quit=True)
+        proxyScraper =ProxyScraper(test_url='https://courson.xyz/coupons', quite=True)
         proxyScraper.scrap()
         proxyScraper.splitGoodProxies()
         self.proxies =proxyScraper.good_proxies
