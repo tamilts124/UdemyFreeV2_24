@@ -4,13 +4,12 @@ from time import sleep
 
 # requests =cloudscraper.CloudScraper()
 class Udemy:
-    def __init__(self, accesstoken:str, sessionid:str, cfclearance:str, myaccesstokens:list=[], max_threads:int=5) -> None:
+    def __init__(self, accesstoken:str, sessionid:str, myaccesstokens:list=[], max_threads:int=5) -> None:
         self.max_threads =max_threads
         self.threads =0
 
         self.accesstoken =accesstoken
         self.sessionid =sessionid
-        self.cf_clearance =cfclearance
         self.cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid}
         # other udemy accounts access token
         self.myaccesstokens =myaccesstokens
