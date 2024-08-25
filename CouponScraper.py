@@ -1,4 +1,4 @@
-from Modules.ProxyScraper import proxyScraper
+from Modules.ProxyScraper import ProxyScraper
 from Modules.RealDiscount import RealDiscount
 from Modules.Courcevania import Coursevania
 from Modules.Courson import Courson
