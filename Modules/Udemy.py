@@ -1,10 +1,12 @@
 import cloudscraper, json, requests
 from threading import Thread
 from time import sleep
+from bs4 import BeautifulSoup
+
 
 # requests =cloudscraper.CloudScraper()
 class Udemy:
-    def __init__(self, accesstoken:str, sessionid:str, myaccesstokens:list=[], max_threads:int=5) -> None:
+    def __init__(self, accesstoken:str='', sessionid:str='', myaccesstokens:list=[], max_threads:int=5) -> None:
         self.max_threads =max_threads
         self.threads =0
 
@@ -23,6 +25,21 @@ class Udemy:
 
         # old coupons
         self.known_coupons =[]
+
+        # login and logout
+        self.headers ={
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Referer': r'https://www.udemy.com/join/login-popup/?locale=en_US&next=https%3A%2F%2Fwww.udemy.com%2F&response_type=html&response_type=json',
+            'Referrer-Policy': 'strict-origin-when-cross-origin'
+        }
+        self.login =False
+        self.log_out_url =''
+
+        # login session
+        self.login_session =''
 
     def get_courseid_by_course_pagedata(self, page_data:str):
         datas =page_data.split('https://img-c.udemycdn.com/course/')
@@ -121,9 +138,52 @@ class Udemy:
             else: print(e)
         return False
 
+    def login_with_credentials(self, email:str, password:str):
+        session =requests.Session()
+        session.headers =self.headers
+        session.get(r'https://www.udemy.com/join/login-popup/?locale=en_US&next=https%3A%2F%2Fwww.udemy.com%2F&response_type=html&response_type=json')
+        
+        if session.cookies.get('csrftoken') == None:
+            raise Exception('CSRF Token fetch error. Cloudflare blocked the request.')
+        sleep(3)
+
+        files =[('email', (None, email)), ('password', (None, password)), ('csrfmiddlewaretoken', (None, session.cookies.get('csrftoken')))]
+        login_result =session.post(r'https://www.udemy.com/join/login-popup/?locale=en_US&next=https%3A%2F%2Fwww.udemy.com%2F&response_type=html&response_type=json', files=files)
+        
+        if 'formErrors' in login_result.text:
+            raise Exception(login_result.text)
+        else:
+            self.accesstoken =session.cookies.get('access_token', '')
+            self.sessionid =session.cookies.get('dj_session_id', '')
+        
+        if self.accesstoken=='' or self.sessionid=='':
+            raise Exception('IMPORTANT: Udemy preventing to login.')
+
+        self.login =True
+        sleep(3)
+        
+        user_header =session.get('https://www.udemy.com/api-2.0/contexts/me/?header=true').json()
+        self.log_out_url =user_header.get('header').get('user').get('logout_url')
+        
+        self.login_session =session
+        print("Login success.\n")
+
+    def logout(self):
+        res =self.login_session.get(r'https://www.udemy.com'+self.log_out_url)
+
+        self.accesstoken =''
+        self.sessionid =''
+
+        print('Logout success.')
+
+    def check_login_alive(self):
+        user_header =self.login_session.get('https://www.udemy.com/api-2.0/contexts/me/?header=true').json()
+        return bool(user_header.get('header').get('isLoggedIn'))
 
 
-
-
+if __name__ == '__main__':
+    udemy =Udemy()
+    udemy.login_with_credentials("email", "password")
+    udemy.logout()
 
 

@@ -26,11 +26,29 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           
+      - name: Restoring the Cache
+        uses: actions/cache@v3
+        with:
+          path: encrypted_session.txt
+          key: session-cache-key
+
       - name: Running Script  
         env:
+          SECURE_KEY: ${{secrets.SECURE_KEY}}
+          
+          EMAIL: ${{secrets.EMAIL}}
+          PASSWORD: ${{secrets.PASSWORD}}
+
           ACCESS_TOKEN: ${{secrets.ACCESS_TOKEN}}
           SESSION_ID: ${{secrets.SESSION_ID}}
-          CF_CLEARANCE: ${{secrets.CF_CLEARANCE}}
           MYACCESSTOKENS: ${{secrets.MYACCESSTOKENS}}
         run: |
           python UdemyEnroller24.py
+
+      - name: Caching the File
+        uses: actions/cache@v3
+        with:
+          path: encrypted_session.txt
+          key: session-cache-key
+
+
