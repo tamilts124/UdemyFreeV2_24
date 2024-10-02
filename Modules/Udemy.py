@@ -31,7 +31,6 @@ class Udemy:
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.5',
-            'Accept-Encoding': 'gzip, deflate, br',
             'Referer': r'https://www.udemy.com/join/login-popup/?locale=en_US&next=https%3A%2F%2Fwww.udemy.com%2F&response_type=html&response_type=json',
             'Referrer-Policy': 'strict-origin-when-cross-origin'
         }
@@ -141,6 +140,8 @@ class Udemy:
     def login_with_credentials(self, email:str, password:str):
         session =requests.Session()
         session.headers =self.headers
+        session.get('https://www.udemy.com/')
+        sleep(5)
         session.get(r'https://www.udemy.com/join/login-popup/?locale=en_US&next=https%3A%2F%2Fwww.udemy.com%2F&response_type=html&response_type=json')
         
         if session.cookies.get('csrftoken') == None:
