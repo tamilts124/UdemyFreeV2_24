@@ -38,6 +38,7 @@ jobs:
           
           EMAIL: ${{secrets.EMAIL}}
           PASSWORD: ${{secrets.PASSWORD}}
+          GMAIL_APP_PASSWORD: ${{secrets.GMAIL_APP_PASSWORD}}
 
           ACCESS_TOKEN: ${{secrets.ACCESS_TOKEN}}
           SESSION_ID: ${{secrets.SESSION_ID}}

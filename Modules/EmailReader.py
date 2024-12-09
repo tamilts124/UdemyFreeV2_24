@@ -21,16 +21,16 @@ class EmailReader:
         try:
             self.connection = imaplib.IMAP4_SSL(self.imap_server)
             self.connection.login(self.username, self.app_password)
-            print("Connected successfully!")
+            print("IMAP Connected successfully!")
         except Exception as e:
-            print(f"Error during connection: {e}")
+            raise Exception(f"Error during connection: {e}")
 
     def list_mailboxes(self):
         """
         List all available mailboxes (folders) in the email account.
         """
         if not self.connection:
-            print("Not connected. Please connect first.")
+            raise Exception("Not connected. Please connect first.")
             return
 
         try:
@@ -42,24 +42,31 @@ class EmailReader:
             else:
                 print("Failed to retrieve mailboxes.")
         except Exception as e:
-            print(f"Error listing mailboxes: {e}")
+            raise Exception(f"Error listing mailboxes: {e}")
 
     def fetch_emails(self, mailbox="inbox", limit=10):
         """
-        Fetch emails from the specified mailbox (default is "inbox").
+        Fetch emails from the specified mailbox (default is "inbox"), sorted by the latest received date.
         """
         if not self.connection:
-            print("Not connected. Please connect first.")
+            raise Exception("Not connected. Please connect first.")
             return []
-        
+
         try:
+            # Select the mailbox
             self.connection.select(mailbox)
+
+            # Search for all emails and sort them in descending order by internal date
             status, messages = self.connection.search(None, "ALL")
             email_ids = messages[0].split()
-            
-            # Limit the number of emails to fetch
-            email_ids = email_ids[-limit:]
-            
+
+            if not email_ids:
+                print("No emails found in the mailbox.")
+                return []
+
+            # Reverse the list to get the latest emails first
+            email_ids = email_ids[::-1][:limit]  # Get the latest 'limit' email IDs
+
             emails = []
             for msg_id in email_ids:
                 res, msg = self.connection.fetch(msg_id, "(RFC822)")
@@ -68,14 +75,16 @@ class EmailReader:
                         msg = email.message_from_bytes(response[1])
                         email_data = self.parse_email(msg)
                         emails.append(email_data)
+
             return emails
         except Exception as e:
-            print(f"Error fetching emails: {e}")
+            raise Exception(f"Error fetching emails: {e}")
             return []
+
 
     def parse_email(self, msg):
         """
-        Parse the raw email message and return its components.
+        Parse the raw email message and return its components, including the date.
         """
         try:
             # Decode the email subject
@@ -86,45 +95,60 @@ class EmailReader:
                 except (UnicodeDecodeError, TypeError):
                     subject = subject.decode("latin-1")  # Fallback to latin-1 if UTF-8 fails
             else:
-                subject = str(subject)  # Ensure subject is a string, in case it's already decoded
+                subject = str(subject)  # Ensure subject is a string
 
-            # Extract sender information
+            # Extract sender information and decode
             sender = msg.get("From")
-            sender = str(sender)  # Ensure sender is a string, even if it's a Header object
+            sender = self.decode_header(sender)  # Ensure sender is properly decoded
 
             # Extract the email body
+            body = None
             if msg.is_multipart():
                 for part in msg.walk():
                     if part.get_content_type() == "text/plain":
                         try:
                             body = part.get_payload(decode=True).decode()
                         except (UnicodeDecodeError, TypeError):
-                            body = part.get_payload(decode=True).decode("latin-1")  # Fallback to latin-1 if UTF-8 fails
+                            body = part.get_payload(decode=True).decode("latin-1")  # Fallback to latin-1
                         break
             else:
                 try:
                     body = msg.get_payload(decode=True).decode()
                 except (UnicodeDecodeError, TypeError):
-                    body = msg.get_payload(decode=True).decode("latin-1")  # Fallback to latin-1 if UTF-8 fails
+                    body = msg.get_payload(decode=True).decode("latin-1")  # Fallback to latin-1
 
-            return {"subject": subject, "sender": sender, "body": body}
+            # Extract the email date
+            raw_date = msg.get("Date")
+            try:
+                parsed_date = email.utils.parsedate_to_datetime(raw_date) if raw_date else None
+            except Exception:
+                parsed_date = None  # Fallback in case of parsing errors
+
+            return {"subject": subject, "sender": sender, "body": body, "date": parsed_date}
         except Exception as e:
-            print(f"Error parsing email: {e}")
-            return {"subject": None, "sender": None, "body": None}
+            raise Exception(f"Error parsing email: {e}")
+            return {"subject": None, "sender": None, "body": None, "date": None}
 
     def filter_emails_by_subject(self, keyword, mailbox="inbox", limit=10):
         """
         Filter emails containing a specific keyword in the subject.
         """
         if not self.connection:
-            print("Not connected. Please connect first.")
+            raise Exception("Not connected. Please connect first.")
             return []
 
         try:
             self.connection.select(mailbox)
             status, messages = self.connection.search(None, "ALL")
             email_ids = messages[0].split()
-            
+
+            if not email_ids:
+                print("No emails found in the mailbox.")
+                return []
+
+            # Reverse the list to process the latest emails first
+            email_ids = email_ids[::-1]
+
             filtered_emails = []
             for msg_id in email_ids:
                 res, msg = self.connection.fetch(msg_id, "(RFC822)")
@@ -134,17 +158,19 @@ class EmailReader:
                         subject, encoding = decode_header(msg["Subject"])[0]
                         if isinstance(subject, bytes):
                             subject = subject.decode(encoding if encoding else "utf-8")
+                        # print(f"Subject (after decoding): {subject}")
+
                         if keyword.lower() in subject.lower():
                             email_data = self.parse_email(msg)
                             filtered_emails.append(email_data)
 
-                # Check if limit is reached
-                if len(filtered_emails) >= limit:
-                    break
+                        # Stop if the limit is reached
+                        if len(filtered_emails) >= limit:
+                            return filtered_emails
 
             return filtered_emails
         except Exception as e:
-            print(f"Error filtering emails by subject: {e}")
+            raise Exception(f"Error filtering emails by subject: {e}")
             return []
 
     def filter_emails_by_date(self, date, mailbox="inbox", limit=10):
@@ -152,16 +178,23 @@ class EmailReader:
         Filter emails from a specific date (YYYY-MM-DD).
         """
         if not self.connection:
-            print("Not connected. Please connect first.")
+            raise Exception("Not connected. Please connect first.")
             return []
 
         try:
             self.connection.select(mailbox)
-            # Convert date to IMAP format
             date_obj = datetime.datetime.strptime(date, "%Y-%m-%d")
             formatted_date = date_obj.strftime("%d-%b-%Y")
+
             status, messages = self.connection.search(None, f'ON {formatted_date}')
             email_ids = messages[0].split()
+
+            if not email_ids:
+                print(f"No emails found for date: {date}.")
+                return []
+
+            # Reverse the list to process the latest emails first
+            email_ids = email_ids[::-1]
 
             filtered_emails = []
             for msg_id in email_ids:
@@ -172,22 +205,21 @@ class EmailReader:
                         email_data = self.parse_email(msg)
                         filtered_emails.append(email_data)
 
-                # Check if limit is reached
-                if len(filtered_emails) >= limit:
-                    break
+                        # Stop if the limit is reached
+                        if len(filtered_emails) >= limit:
+                            return filtered_emails
 
             return filtered_emails
         except Exception as e:
-            print(f"Error filtering emails by date: {e}")
+            raise Exception(f"Error filtering emails by date: {e}")
             return []
-
 
     def filter_emails_by_sender(self, sender_email, mailbox="inbox", limit=10):
         """
         Filter emails from a specific sender.
         """
         if not self.connection:
-            print("Not connected. Please connect first.")
+            raise Exception("Not connected. Please connect first.")
             return []
 
         try:
@@ -195,8 +227,12 @@ class EmailReader:
             status, messages = self.connection.search(None, "ALL")
             email_ids = messages[0].split()
 
-            # Limit the number of emails to fetch
-            email_ids = email_ids[-limit:]
+            if not email_ids:
+                print("No emails found in the mailbox.")
+                return []
+
+            # Reverse the list to process the latest emails first
+            email_ids = email_ids[::-1]
 
             filtered_emails = []
             for msg_id in email_ids:
@@ -208,19 +244,22 @@ class EmailReader:
                         # Extract and decode the raw 'From' field
                         sender = msg.get("From")
                         decoded_sender = self.decode_header(sender)
-
-                        # Parse the 'From' field using parseaddr to handle complex formats
+                        # print(f"Sender (after decoding): {decoded_sender}")
                         _, email_address = parseaddr(decoded_sender)
 
-                        # Compare the email address part only
                         if sender_email.lower() in email_address.lower():
                             email_data = self.parse_email(msg)
                             filtered_emails.append(email_data)
 
-                return filtered_emails
+                        # Stop if the limit is reached
+                        if len(filtered_emails) >= limit:
+                            return filtered_emails
+
+            return filtered_emails
         except Exception as e:
-            print(f"Error filtering emails by sender: {e}")
+            raise Exception(f"Error filtering emails by sender: {e}")
             return []
+
 
     def decode_header(self, header):
         """
@@ -229,32 +268,33 @@ class EmailReader:
         try:
             # Decode the header using make_header
             decoded_header = str(make_header(decode_header(header)))
+            # print(f"Decoded header: {decoded_header}")
             return decoded_header
         except Exception as e:
-            return header  # Return the raw header if decoding fails
+            raise Exception(f"Error decoding header: {e}")
+            return str(header)  # Return the raw header if decoding fails
 
-    def filter_emails_combined(self, subject=None, sender_email=None, date=None, mailbox="inbox", limit=10):
+    def filter_emails_combined(self, subject_keyword=None, date=None, sender_email=None, mailbox="inbox", limit=10):
         """
-        Apply multiple filters: subject, sender, and date.
+        Combine filters: subject keyword, date, and sender email.
+        Retrieve emails matching all specified criteria, ordered by most recent first.
         """
         if not self.connection:
-            print("Not connected. Please connect first.")
+            raise Exception("Not connected. Please connect first.")
             return []
 
         try:
             self.connection.select(mailbox)
-            
-            # Format the date to the IMAP required format (DD-Mon-YYYY)
-            if date:
-                date_obj = datetime.datetime.strptime(date, "%Y-%m-%d")
-                formatted_date = date_obj.strftime("%d-%b-%Y")
-                search_query = f'ON {formatted_date}'
-            else:
-                search_query = "ALL"
-
-            status, messages = self.connection.search(None, search_query)
+            status, messages = self.connection.search(None, "ALL")
             email_ids = messages[0].split()
-            
+
+            if not email_ids:
+                print("No emails found in the mailbox.")
+                return []
+
+            # Reverse the list to process the latest emails first
+            email_ids = email_ids[::-1]
+
             filtered_emails = []
             for msg_id in email_ids:
                 res, msg = self.connection.fetch(msg_id, "(RFC822)")
@@ -262,24 +302,39 @@ class EmailReader:
                     if isinstance(response, tuple):
                         msg = email.message_from_bytes(response[1])
                         email_data = self.parse_email(msg)
-                        
-                        # Check if email matches all specified filters
-                        if subject and email_data["subject"] and subject.lower() not in email_data["subject"].lower():
-                            continue
-                        if sender_email and email_data["sender"] and sender_email.lower() not in email_data["sender"].lower():
-                            continue
-                        
+
+                        # Apply filters
+
+                        # Subject filter
+                        if subject_keyword:
+                            subject = email_data["subject"]
+                            if not subject or subject_keyword.lower() not in subject.lower():
+                                continue
+
+                        # Date filter
+                        if date:
+                            email_date = email_data["date"]
+                            if email_date is None or email_date.strftime("%Y-%m-%d") != date:
+                                continue
+
+                        # Sender filter
+                        if sender_email:
+                            sender = email_data["sender"]
+                            if not sender_email.lower() in sender.lower():
+                                continue
+
+                        # Add to results if all conditions are met
                         filtered_emails.append(email_data)
 
-                # Break if limit reached
-                if len(filtered_emails) >= limit:
-                    break
+                        # Stop if the limit is reached
+                        if len(filtered_emails) >= limit:
+                            return filtered_emails
 
             return filtered_emails
-
         except Exception as e:
-            print(f"Error applying combined filters: {e}")
+            raise Exception(f"Error applying combined filters: {e}")
             return []
+
 
     def is_email_on_date(self, msg, date):
         """
@@ -295,7 +350,7 @@ class EmailReader:
             # Compare the dates
             return email_date_obj.strftime("%d-%b-%Y") == formatted_date
         except Exception as e:
-            print(f"Error checking email date: {e}")
+            raise Exception(f"Error checking email date: {e}")
             return False
 
     def close_connection(self):

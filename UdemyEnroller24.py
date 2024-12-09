@@ -7,6 +7,7 @@ SECURE_KEY =os.environ['SECURE_KEY']
 
 EMAIL =os.environ['EMAIL']
 PASSWORD =os.environ['PASSWORD']
+GMAIL_APP_PASSWORD =os.environ['GMAIL_APP_PASSWORD']
 
 ACCESSTOKEN =os.environ['ACCESS_TOKEN']
 SESSIONID =os.environ['SESSION_ID']
@@ -43,7 +44,7 @@ def main():
     if udemy==None:
         udemy =Udemy()
         if EMAIL and PASSWORD:
-            udemy.login_with_credentials(EMAIL, PASSWORD)
+            udemy.login_with_credentials(EMAIL, PASSWORD, GMAIL_APP_PASSWORD)
         else:
             udemy.sessionid =SESSIONID
             udemy.accesstoken =ACCESSTOKEN

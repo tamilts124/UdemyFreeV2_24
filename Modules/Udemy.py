@@ -2,7 +2,10 @@ import cloudscraper, json, requests
 from threading import Thread
 from time import sleep
 from bs4 import BeautifulSoup
-
+from UdemyChromeLogin import launch_form, submit_otp
+from EmailReader import EmailReader
+import datetime
+import re
 
 # requests =cloudscraper.CloudScraper()
 class Udemy:
@@ -31,7 +34,7 @@ class Udemy:
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.5',
-            'Referer': r'https://www.udemy.com/join/login-popup/?locale=en_US&next=https%3A%2F%2Fwww.udemy.com%2F&response_type=html&response_type=json',
+            # 'Referer': r'https://www.udemy.com/join/login-popup/?locale=en_US&next=https%3A%2F%2Fwww.udemy.com%2F&response_type=html&response_type=json',
             'Referrer-Policy': 'strict-origin-when-cross-origin'
         }
         self.login =False
@@ -137,19 +140,26 @@ class Udemy:
             else: print(e)
         return False
 
-    def login_with_credentials(self, email:str, password:str):
+    def login_with_credentials(self, email:str, udemy_password:str, gmail_password:str):
         session =requests.Session()
         session.headers =self.headers
         session.get('https://www.udemy.com/')
         sleep(5)
-        session.get(r'https://www.udemy.com/join/login-popup/?locale=en_US&next=https%3A%2F%2Fwww.udemy.com%2F&response_type=html&response_type=json')
+        cookies =requests.get(r'https://www.udemy.com/join/passwordless-auth/?locale=en_US&next=https%3A%2F%2Fwww.udemy.com%2F&response_type=html').cookies
         
+        session.cookies.update(cookies)
         if session.cookies.get('csrftoken') == None:
             raise Exception('CSRF Token fetch error. Cloudflare blocked the request.')
         sleep(3)
 
-        files =[('email', (None, email)), ('password', (None, password)), ('csrfmiddlewaretoken', (None, session.cookies.get('csrftoken')))]
+        files =[('email', (None, email)), ('password', (None, udemy_password)), ('csrfmiddlewaretoken', (None, session.cookies.get('csrftoken')))]
         login_result =session.post(r'https://www.udemy.com/join/login-popup/?locale=en_US&next=https%3A%2F%2Fwww.udemy.com%2F&response_type=html&response_type=json', files=files)
+        # data =json.dumps({
+        #     'email': email,
+        #     'fullname': ''
+        # })
+        # request_result =requests.post(r'https://www.udemy.com/api-2.0/auth/code-generation/login/4.0/', data=data, cookies=cookies)
+        # print(request_result, request_result.text)
         
         if 'formErrors' in login_result.text:
             raise Exception(login_result.text)
@@ -158,7 +168,32 @@ class Udemy:
             self.sessionid =session.cookies.get('dj_session_id', '')
         
         if self.accesstoken=='' or self.sessionid=='':
-            raise Exception('IMPORTANT: Udemy preventing to login.')
+            # raise Exception('IMPORTANT: Udemy preventing to login.')
+            print('IMPORTANT: Udemy preventing to login. so launching automated chrome')
+            launch_form(email)
+            email_reader =EmailReader(email, gmail_password)
+            email_reader.connect()
+            mail =email_reader.filter_emails_combined(sender_email='no-reply@e.udemymail.com', subject_keyword='login', date=datetime.date.today().strftime(r'%Y-%m-%d'), mailbox='[Gmail]/Spam', limit=1)
+            if mail:
+                mail_body =mail[0]['body']
+                pattern = r"(\d{6})This code expires"
+                match = re.search(pattern, mail_body)
+
+                if match:
+                    extracted_code = match.group(1)
+                    cookies =submit_otp(extracted_code)
+                    for cookie in cookies:
+                        session.cookies.set(cookie['name'], cookie['value'])
+        
+                    self.accesstoken =session.cookies.get('access_token', '')
+                    self.sessionid =session.cookies.get('dj_session_id', '')
+        
+                    if not self.accesstoken or not self.sessionid:
+                        raise Exception('IMPORTANT: Udemy browser login failed.')
+                else:
+                    raise Exception('ERROR: OTP cant able to find.')
+            else:
+                raise Exception('ERROR: Unable to find the mail.')
 
         self.login =True
         sleep(3)
@@ -184,7 +219,7 @@ class Udemy:
 
 if __name__ == '__main__':
     udemy =Udemy()
-    udemy.login_with_credentials("email", "password")
+    udemy.login_with_credentials("email", "password", "app_password")
     udemy.logout()
 
 
