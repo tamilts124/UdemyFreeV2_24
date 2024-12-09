@@ -2,3 +2,4 @@ __pycache__
 test.txt
 test.py
 *.json
+encrypted_*
