@@ -20,7 +20,7 @@ class RealDiscount:
     def get_articles_link(self):
         anger_tags =BeautifulSoup(requests.get('https://www.real.discount/articles/').text, 'html.parser').findAll('a')
         for anger_tag in anger_tags:
-            if anger_tag.get('href', '').startswith('https://app.real.discount/article/'): self.articles_link.append(anger_tag['href'])
+            if anger_tag.get('href', '').startswith('https://www.real.discount/article/'): self.articles_link.append(anger_tag['href'])
         
     def get_offerslink_by_articleslink(self, articles_link:list):
         self.offers_link =[]

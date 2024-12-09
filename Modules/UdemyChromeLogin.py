@@ -29,6 +29,8 @@ def submit_otp(otp:int)->list:
     sleep(10)
 
     cookies =driver.get_cookies()
+
+    # print(cookies)
     sleep(1)
     driver.close()
     return cookies

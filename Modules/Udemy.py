@@ -182,6 +182,7 @@ class Udemy:
                 if match:
                     extracted_code = match.group(1)
                     cookies =submit_otp(extracted_code)
+                    session.cookies.clear()
                     for cookie in cookies:
                         session.cookies.set(cookie['name'], cookie['value'])
         
