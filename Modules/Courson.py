@@ -26,7 +26,7 @@ class Courson:
 		if self.proxy_index>=self.proxy_mindex:
 			self.proxy_index =0
 		if self.proxy_mindex:
-			print(self.proxy_index, self.proxy_mindex)
+			# print(self.proxy_index, self.proxy_mindex)
 			self.proxy =self.proxies[self.proxy_index]
 			self.proxy_index +=1
 		else: self.proxy =None

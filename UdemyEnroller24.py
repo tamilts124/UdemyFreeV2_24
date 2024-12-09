@@ -1,4 +1,4 @@
-import os, json, pickle
+import os, json, pickle, math
 from Modules.Udemy import Udemy
 from CouponScraper import CouponScraper
 from Modules.AES_Base64 import AES_Base64
@@ -12,6 +12,7 @@ GMAIL_APP_PASSWORD =os.environ['GMAIL_APP_PASSWORD']
 ACCESSTOKEN =os.environ['ACCESS_TOKEN']
 SESSIONID =os.environ['SESSION_ID']
 MYACCESSTOKENS =list(filter(lambda s: bool(s), os.environ['MYACCESSTOKENS'].split(',')))
+
 
 def main():
     key =SECURE_KEY.encode()
@@ -51,19 +52,26 @@ def main():
 
         udemy.myaccesstokens =MYACCESSTOKENS
     
+    udemy.courses_cart =[]
+    udemy.usable_coupons =[]
+    udemy.nonusable_coupons =[]
+
     couponScraper =CouponScraper()
     couponScraper.scrap(0, 2)
     coupon_datas =couponScraper.coupon_datas
 
     udemy.check_coupon_and_addcart(coupon_datas)
-    print(udemy.courses_cart, udemy.usable_coupons, udemy.nonusable_coupons)
+    # print(udemy.courses_cart, udemy.usable_coupons, udemy.nonusable_coupons)
     if len(udemy.usable_coupons)==0:
         print("No coupons Availbales to Enroll.")
     else:
-        status =udemy.enroll_courses(udemy.courses_cart)
-        print("Total Coupons:", len(udemy.usable_coupons))
-        print("Entroll Status:","Success" if status else "Failed")
-    
+        udemy_enroll_limit =50
+        for i in range(math.ceil(len(udemy.courses_cart)/udemy_enroll_limit)):
+            status =udemy.enroll_courses(udemy.courses_cart[i*udemy_enroll_limit:(i+1)*udemy_enroll_limit])
+            print("Total Coupons:", len(udemy.usable_coupons))
+            print("Entroll Status:","Success" if status else "Failed")
+            print()
+
     if udemy.login==True:
         with open('encrypted_session.txt', 'wt') as file:
             pickle_data =pickle.dumps(udemy)

@@ -3,9 +3,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from time import sleep
 
-driver = uc.Chrome()
 
 def launch_form(email: str)->None:
+    driver = uc.Chrome()
     driver.get(r'https://www.udemy.com/join/passwordless-auth/?locale=en_US&next=https%3A%2F%2Fwww.udemy.com%2F&response_type=html')
     sleep(5)
 

@@ -4,7 +4,7 @@ from time import sleep
 from bs4 import BeautifulSoup
 from Modules.UdemyChromeLogin import launch_form, submit_otp
 from Modules.EmailReader import EmailReader
-import datetime
+from datetime import datetime, timezone
 import re
 
 # requests =cloudscraper.CloudScraper()
@@ -68,6 +68,7 @@ class Udemy:
         }
     
     def thread_check_coupon_and_addcart(self, coupon_data:list):
+        self.cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid}
         course_title =coupon_data[0]
         course_name =coupon_data[1].split('/')[-2]
         coupon_code =coupon_data[1].split('=')[-1]
@@ -81,6 +82,7 @@ class Udemy:
                 print(e, 'Udemy Prevention Detected.', )
                 pass
         if result_json and result_json.get('uses_remaining', ''):
+            # print('remaining uses:', result_json.get('uses_remaining', ''))
             while True:
                 result_page =requests.get(f'https://www.udemy.com/api-2.0/courses/{course_id}/subscriber-curriculum-items/', cookies=self.cookies)
                 if result_page.status_code<500: break
@@ -122,6 +124,8 @@ class Udemy:
 
     def enroll_courses(self, courses_cart:list):
         try:
+            self.cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid}
+
             common_data ={
                 "checkout_environment":"Marketplace",
                 "checkout_event":"Submit",
@@ -129,9 +133,11 @@ class Udemy:
                 "payment_info":{"method_id":"0","payment_vendor":"Free","payment_method":"free-method"}
             }
             # if os.environ.get('CF_CLEARANCE'): cookies['cf_clearance'] =os.environ['CF_CLEARANCE']
+            self.cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid}
             result_page =requests.post('https://www.udemy.com/payment/checkout-submit/', headers={'Content-Type': 'application/json'}, cookies=self.cookies, data=json.dumps(common_data))
-            result_json =result_page.json()
-            # print(result_json, common_data)
+            result_json =result_page.json()            
+
+            # print(result_json)
             if result_json.get('status', '')=='succeeded': return True
             elif 'You do not have permission to perform this action' in result_json.get('detail', ''):
                     raise Exception('Enroll Fail, Session id or Access Token is Expired...\n')
@@ -173,7 +179,7 @@ class Udemy:
             launch_form(email)
             email_reader =EmailReader(email, gmail_password)
             email_reader.connect()
-            mail =email_reader.filter_emails_combined(sender_email='no-reply@e.udemymail.com', subject_keyword='login', date=datetime.date.today().strftime(r'%Y-%m-%d'), mailbox='[Gmail]/Spam', limit=1)
+            mail =email_reader.filter_emails_combined(sender_email='no-reply@e.udemymail.com', subject_keyword='login', date=datetime.now(timezone.utc).strftime(r'%Y-%m-%d'), mailbox='[Gmail]/Spam', limit=1)
             if mail:
                 mail_body =mail[0]['body']
                 pattern = r"(\d{6})This code expires"
@@ -182,7 +188,7 @@ class Udemy:
                 if match:
                     extracted_code = match.group(1)
                     cookies =submit_otp(extracted_code)
-                    session.cookies.clear()
+                    session.cookies.clear(domain='www.udemy.com', path='/', name='dj_session_id')
                     for cookie in cookies:
                         session.cookies.set(cookie['name'], cookie['value'])
         
