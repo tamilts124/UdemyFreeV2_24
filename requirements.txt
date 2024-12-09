@@ -2,3 +2,4 @@ bs4
 cloudscraper
 pycryptodome
 imapclient
+undetected_chromedriver
