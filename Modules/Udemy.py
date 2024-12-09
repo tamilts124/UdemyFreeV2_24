@@ -2,8 +2,8 @@ import cloudscraper, json, requests
 from threading import Thread
 from time import sleep
 from bs4 import BeautifulSoup
-from UdemyChromeLogin import launch_form, submit_otp
-from EmailReader import EmailReader
+from Modules.UdemyChromeLogin import launch_form, submit_otp
+from Modules.EmailReader import EmailReader
 import datetime
 import re
 
