@@ -18,20 +18,22 @@ def launch_udemy_login(email: str, password: str)->[bool, list]:
     email_field.send_keys(email)
     sleep(1)
 
-    password_field =driver.find_element(By.NAME, 'password')
-
-    if password_fied:
+    try:
+        password_field =driver.find_element(By.NAME, 'password')
         password_field.send_keys(password)
         sleep(1)
+
         login_button =driver.find_element(By.CLASS_NAME, 'helpers--auth-submit-button--W3Tqk')
         login_button.click()
         sleep(10)
+        
         cookies =driver.get_cookies()
         sleep(1)
         driver.close()
         return [True, cookies]
+    
+    except Exception:
 
-    else:
         form =driver.find_element(By.CSS_SELECTOR, 'form[data-purpose=code-generation-form]')
         submit_button =form.find_element(By.CSS_SELECTOR, 'button')
         submit_button.click()
