@@ -148,33 +148,36 @@ class Udemy:
     def login_with_credentials(self, email:str, udemy_password:str, gmail_password:str):
 
         print('IMPORTANT: Launching Udemy automated login in chrome.')
-        launch_udemy_login(email)
-        email_reader =EmailReader(email, gmail_password)
-        email_reader.connect()
-        mail =email_reader.filter_emails_combined(sender_email='no-reply@e.udemymail.com', subject_keyword='login', date=datetime.now(timezone.utc).strftime(r'%Y-%m-%d'), mailbox='[Gmail]/Spam', limit=1)
-        if mail:
-            mail_body =mail[0]['body']
-            pattern = r"(\d{6})This code expires"
-            match = re.search(pattern, mail_body)
+        isOldLogin, browser_cookies =launch_udemy_login(email, udemy_password)
+        if not isOldLogin:
+            email_reader =EmailReader(email, gmail_password)
+            email_reader.connect()
+            mail =email_reader.filter_emails_combined(sender_email='no-reply@e.udemymail.com', subject_keyword='login', date=datetime.now(timezone.utc).strftime(r'%Y-%m-%d'), mailbox='[Gmail]/Spam', limit=1)
+            if mail:
+                mail_body =mail[0]['body']
+                pattern = r"(\d{6})This code expires"
+                match = re.search(pattern, mail_body)
 
-            if match:
-                extracted_code = match.group(1)
-                browser_cookies =submit_otp(extracted_code)
+                if match:
+                    extracted_code = match.group(1)
+                    browser_cookies =submit_otp(extracted_code)
                 # print(cookies)
-                cookies ={}
-                for cookie in browser_cookies:
-                    cookies[cookie['name']] =cookie['value']
-
-                self.accesstoken =cookies.get('access_token', '')
-                self.sessionid =cookies.get('dj_session_id', '')
-
-                if not self.accesstoken or not self.sessionid:
-                    raise Exception('IMPORTANT: Udemy browser login failed.')
+                
+                else:
+                    raise Exception('ERROR: OTP cant able to find.')
             else:
-                raise Exception('ERROR: OTP cant able to find.')
-        else:
-            raise Exception('ERROR: Unable to find the mail.')
+                raise Exception('ERROR: Unable to find the mail.')
         
+        cookies ={}
+        for cookie in browser_cookies:
+            cookies[cookie['name']] =cookie['value']
+
+        self.accesstoken =cookies.get('access_token', '')
+        self.sessionid =cookies.get('dj_session_id', '')
+
+        if not self.accesstoken or not self.sessionid:
+            raise Exception('IMPORTANT: Udemy browser login failed.')
+
         self.cookies =cookies
         
         self.login =True
