@@ -18,11 +18,11 @@ class CouponScraper:
             else: self.coupon_datas.append(coupon_data)
 
     def scrap(self, from_day:str, to_day:str):
-        proxyScraper =ProxyScraper(test_url='https://courson.xyz/coupons', quite=True)
-        proxyScraper.scrap()
-        proxyScraper.splitGoodProxies()
-        self.proxies =proxyScraper.good_proxies
-        print("Working proxies:", len(self.proxies))
+        # proxyScraper =ProxyScraper(test_url='https://courson.xyz/coupons', quite=True)
+        # proxyScraper.scrap()
+        # proxyScraper.splitGoodProxies()
+        # self.proxies =proxyScraper.good_proxies
+        # print("Working proxies:", len(self.proxies))
 
         # real discount
         real_discount =RealDiscount()
@@ -40,9 +40,9 @@ class CouponScraper:
         except Exception as e:
             print("Coursevania offers cant fetch.")
 
-        # courson
-        courson =Courson(proxies=self.proxies, max_threads=2)
-        courson.collect_course_pages()
-        courson.collect_coupons_by_course_pages(courson.course_pages)
-        self.combineUniqueLinks(courson.coupons)
+        # # courson
+        # courson =Courson(proxies=self.proxies, max_threads=2)
+        # courson.collect_course_pages()
+        # courson.collect_coupons_by_course_pages(courson.course_pages)
+        # self.combineUniqueLinks(courson.coupons)
 
