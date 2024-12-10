@@ -5,7 +5,7 @@ from time import sleep
 
 driver =None
 
-def launch_form(email: str)->None:
+def launch_udemy_login(email: str)->None:
     global driver
     driver = uc.Chrome()
     driver.get(r'https://www.udemy.com/join/passwordless-auth/?locale=en_US&next=https%3A%2F%2Fwww.udemy.com%2F&response_type=html')
