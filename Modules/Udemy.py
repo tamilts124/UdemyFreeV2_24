@@ -9,7 +9,7 @@ import re
 
 # requests =cloudscraper.CloudScraper()
 class Udemy:
-    def __init__(self, accesstoken:str='', sessionid:str='', myaccesstokens:list=[], max_threads:int=5) -> None:
+    def __init__(self, accesstoken:str='', sessionid:str='', myaccesstokens:list=[], max_threads:int=50) -> None:
         self.max_threads =max_threads
         self.threads =0
 
@@ -72,12 +72,16 @@ class Udemy:
         course_title =coupon_data[0]
         course_name =coupon_data[1].split('/')[-2]
         coupon_code =coupon_data[1].split('=')[-1]
-        course_id, result_json =None, None
+        course_id, result_json, tries =None, None, 10
         while True:
             try:
-                if not course_id: course_id =self.get_courseid_by_course_pagedata(requests.get(coupon_data[1]).text)
+                course_page =requests.get(coupon_data[1])
+                if not course_id: course_id =self.get_courseid_by_course_pagedata(course_page.text)
                 if not result_json: result_json =self.get_coupon_status(course_id, coupon_code)
                 if course_id: break
+                tries -=1
+                # this course no longer allowed to enroll means, should break
+                if course_page.status_code==302 or tries<=0: break
             except Exception as e:
                 print(e, 'Udemy Prevention Detected.', )
                 pass
@@ -92,7 +96,7 @@ class Udemy:
                 for accesstoken in self.myaccesstokens:
                     while True:
                         result_page =requests.get(f'https://www.udemy.com/api-2.0/courses/{course_id}/subscriber-curriculum-items/', cookies={**self.cookies, 'access_token': accesstoken})
-                        if result_page.status_code<500: break                      
+                        if result_page.status_code<500: break
                     if 'you do not have permission to perform this action.' not in result_page.text.lower():
                         coupon_availablity =False
                         break
@@ -115,8 +119,8 @@ class Udemy:
                 self.nonusable_coupons.append(coupon_datas[coupon_data_index])
                 continue
             else:
-                Thread(target=self.thread_check_coupon_and_addcart, args=[coupon_datas[coupon_data_index]]).start()
                 self.threads +=1
+                Thread(target=self.thread_check_coupon_and_addcart, args=[coupon_datas[coupon_data_index]]).start()
             while (self.threads>=self.max_threads or (coupon_data_index==len(coupon_datas)-1 and len(coupon_datas)>len(self.usable_coupons)+len(self.nonusable_coupons))):
                 # print(f'{len(self.usable_coupons)+len(self.nonusable_coupons)}/{len(coupon_datas)}', '\r')
                 sleep(0.2)
