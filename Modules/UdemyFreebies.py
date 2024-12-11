@@ -8,6 +8,7 @@ class UdemyFreebies:
         self.from_page =from_page
         self.to_page =to_page
         self.coupons =[]
+        self.waste_coupons =[]
         self.threads =0
         self.mthreads =threads
 
@@ -19,30 +20,28 @@ class UdemyFreebies:
             html_page =requests.get(self.base_url+'/free-udemy-courses/'+str(self.from_page)).text
             html_page_soup =BeautifulSoup(html_page, 'html.parser')
 
-            a_tags =html_page_soup.find_all('a')
-            for a_tag in a_tags:
-                if a_tag.text.strip()=='Coupon Detail':
-                    self.freebies_course_links.append(a_tag['href'])
+            div_tags =html_page_soup.find_all('div', {'class': 'coupon-name'})
+            for div_tag in div_tags:
+                a_tag =div_tag.find('a')
+                self.freebies_course_links.append([a_tag.text, a_tag['href']])
             self.from_page +=1
-        self.freebies_course_links =list(set(self.freebies_course_links))
 
-    def get_udemy_location_header_from_url(self, offer_link):
+    def thread_udemy_location_fetch_from_url(self, offer_name, offer_link):
         freebies_response_header =requests.get(offer_link, allow_redirects=False).headers
-        self.coupons.append(freebies_response_header['location'])
+        self.coupons.append([offer_name, freebies_response_header['location']])
         self.threads -=1
 
     def collect_coupons(self, freebies_links:list):
 
         for freebies_link in freebies_links:
-            partial_offer_link =freebies_link.split(self.base_url+'/free-udemy-course')[-1]
+            partial_offer_link =freebies_link[1].split(self.base_url+'/free-udemy-course')[-1]
             offer_link =self.base_url+'/out'+partial_offer_link
             while (self.threads>=self.mthreads): pass
             self.threads+=1
-            Thread(target=self.get_udemy_location_header_from_url, args=[offer_link]).start()
+            Thread(target=self.thread_udemy_location_fetch_from_url, args=[freebies_link[0], offer_link]).start()
         
         while len(self.coupons)!=len(self.freebies_course_links): pass
 
-        self.coupons =list(set(self.coupons))
 
 if __name__ == '__main__':
     udemyFreebies =UdemyFreebies(1,1)
