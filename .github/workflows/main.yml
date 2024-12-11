@@ -26,12 +26,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           
+      # Step 1: Try to Restore the Cache
       - name: Restoring the Cache
         uses: actions/cache@v3
         with:
           path: encrypted_session.txt
-          # Use a dynamic cache key by adding a unique identifier
-          key: session-cache-key-${{ github.run_id }}
+          key: session-cache-key
 
 
       - name: Running Script  
@@ -47,4 +47,13 @@ jobs:
           MYACCESSTOKENS: ${{secrets.MYACCESSTOKENS}}
         run: |
           python UdemyEnroller24.py
-
+          
+      # Step 3: Save the Updated Cache
+      - name: Save the Cache
+        uses: actions/cache@v3
+        with:
+          path: encrypted_session.txt
+          key: session-cache-key
+          # Ensure to forcefully save it if content changes
+          restore-keys: |
+            session-cache-key
