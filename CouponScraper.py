@@ -40,6 +40,14 @@ class CouponScraper:
         except Exception as e:
             print("Coursevania offers cant fetch.")
 
+        # yofreesamples
+        try:
+            yoFreeSamples =YoFreeSamples()
+            yoFreeSamples.collect_coupons()
+            self.combineUniqueLinks(yoFreeSamples.coupons)
+        except Exception as e:
+            print("YoFreeSamples offers cant fetch.")
+
         # # courson
         # courson =Courson(proxies=self.proxies, max_threads=2)
         # courson.collect_course_pages()
