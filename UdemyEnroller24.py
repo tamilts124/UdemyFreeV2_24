@@ -65,7 +65,7 @@ def main():
     if len(udemy.usable_coupons)==0:
         print("No coupons Availbales to Enroll.")
     else:
-        udemy_enroll_limit =40
+        udemy_enroll_limit =30
         for i in range(math.ceil(len(udemy.courses_cart)/udemy_enroll_limit)):
             status =udemy.enroll_courses(udemy.courses_cart[i*udemy_enroll_limit:(i+1)*udemy_enroll_limit])
             print("Working Coupons:", len(udemy.usable_coupons))
