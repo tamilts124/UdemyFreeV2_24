@@ -38,7 +38,7 @@ class CouponScraper:
             coursevania.get_coupons_by_offerslink(coursevania.offers_link)
             self.coupon_datas.extend(coursevania.coupons)
         except Exception as e:
-            print("Coursevania offers cant fetch.")
+            print("Coursevania offers cant fetch. Error:", e)
 
         # yofreesamples
         try:
@@ -46,7 +46,7 @@ class CouponScraper:
             yoFreeSamples.collect_coupons()
             self.coupon_datas.extend(yoFreeSamples.coupons)
         except Exception as e:
-            print("YoFreeSamples offers cant fetch.")
+            print("YoFreeSamples offers cant fetch. Error:", e)
 
         # udemyfreebies
         try:
@@ -55,7 +55,7 @@ class CouponScraper:
             udemyFreebies.collect_coupons(udemyFreebies.freebies_course_links)
             self.coupon_datas.extend(udemyFreebies.coupons)
         except Exception as e:
-            print("Udemy Freebies offers cant fetch.")
+            print("Udemy Freebies offers cant fetch. Error:", e)
 
         # # courson
         # courson =Courson(proxies=self.proxies, max_threads=2)
