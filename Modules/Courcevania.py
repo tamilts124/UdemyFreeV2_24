@@ -35,11 +35,15 @@ class Coursevania:
                 if anger_tag and anger_tag['href']: self.offers_link.append([h5_tag.text, anger_tag['href']])
 
     def thread_get_coupons_by_offerslink(self, offer_link:list):
-        offer_page =requests.get(offer_link[1]).text
-        self.threads -=1
+        offer_page =None
+        while not offer_page:
+            try:
+                offer_page =requests.get(offer_link[1]).text
+            except Exception as e: print('Courcevania requests issue') 
         offer =BeautifulSoup(offer_page, 'html.parser')
         anger_tag =offer.find('a', {'class': 'masterstudy-button-affiliate__link'})
         self.coupons.append([offer_link[0], anger_tag['href']])
+        self.threads -=1
 
     def get_coupons_by_offerslink(self, offers_link:list):
         for offer_link_index in range(len(offers_link)):

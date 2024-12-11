@@ -31,14 +31,14 @@ class CouponScraper:
         real_discount.get_articles_link()
         real_discount.get_offerslink_by_articleslink(real_discount.articles_link[from_day:to_day])
         real_discount.collectcoupons_by_offerslink(real_discount.offers_link)
-        self.coupon_datas.extend(real_discount.coupons)
+        self.coupon_datas.extend(map(lambda e:e[1], real_discount.coupons))
 
         # coursevania
         try:
             coursevania =Coursevania()
             coursevania.get_home_page_offerslink(from_day, to_day)
             coursevania.get_coupons_by_offerslink(coursevania.offers_link)
-            self.coupon_datas.extend(coursevania.coupons)
+            self.coupon_datas.extend(map(lambda e:e[1], coursevania.coupons))
         except Exception as e:
             print("Coursevania offers cant fetch. Error:", e)
 
@@ -52,7 +52,7 @@ class CouponScraper:
 
         # udemyfreebies
         try:
-            udemyFreebies =UdemyFreebies(from_day, to_day)
+            udemyFreebies =UdemyFreebies(from_day+1, to_day)
             udemyFreebies.collect_freebies_course_links()
             udemyFreebies.collect_coupons(udemyFreebies.freebies_course_links)
             self.coupon_datas.extend(udemyFreebies.coupons)
@@ -66,3 +66,4 @@ class CouponScraper:
         # self.combineUniqueLinks(courson.coupons)
 
         self.coupon_datas =list(set(self.coupon_datas))
+
