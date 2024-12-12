@@ -29,7 +29,7 @@ class DiscUdemy:
 
             self.from_day +=1
 
-    def update_disudemy_coupons_through_url(self, offer):
+    def thread_disudemy_coupons_through_url(self, offer):
         partial_course_url = offer[1].split(self.base_url)[-1].split('/')[-1]
         disudemy_link =self.base_url+'/go/'+partial_course_url
         html_page =requests.get(disudemy_link).text
@@ -54,7 +54,7 @@ class DiscUdemy:
         for disudemy_url in disudemy_urls:
             while self.threads >=self.mthreads: sleep(0.2)
             self.threads +=1
-            Thread(target=self.update_disudemy_coupons_through_url, args=[disudemy_url]).start()
+            Thread(target=self.thread_disudemy_coupons_through_url, args=[disudemy_url]).start()
 
         while len(self.discudemy_course_urls)>len(self.coupons)+len(self.unwanted_links): sleep(0.2)
 

@@ -4,6 +4,7 @@ from Modules.Courcevania import Coursevania
 from Modules.YoFreeSamples import YoFreeSamples
 from Modules.UdemyFreebies import UdemyFreebies
 from Modules.DiscUdemy import DiscUdemy
+from Modules.CourseJoiner import CourseJoiner
 from Modules.Courson import Courson
 import urllib3
 
@@ -69,6 +70,15 @@ class CouponScraper:
             self.combineUniqueLinks(discUdemy.coupons)
         except Exception as e:
             print("Disc Udemy offers cant fetch. Error:", e)
+
+        # coursejoiner
+        try:
+            courseJoiner =CourseJoiner(from_day+1, to_day)
+            courseJoiner.collect_course_joiner_coupon_links()
+            courseJoiner.collect_courses(courseJoiner.course_joiner_coupon_links)
+            self.combineUniqueLinks(courseJoiner.coupons)
+        except Exception as e:
+            print("Course Joiner offers cant fetch. Error:", e)
 
         # # courson
         # courson =Courson(proxies=self.proxies, max_threads=2)
