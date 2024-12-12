@@ -59,6 +59,16 @@ class CouponScraper:
         except Exception as e:
             print("Udemy Freebies offers cant fetch. Error:", e)
 
+
+        # discudemy
+        try:
+            discUdemy =DiscUdemy(from_day+1, to_day)
+            discUdemy.collect_discudemy_course_urls()
+            discUdemy.collect_courses(discUdemy.discudemy_course_urls)
+            self.combineUniqueLinks(discUdemy.coupons)
+        except Exception as e:
+            print("Disc Udemy offers cant fetch. Error:", e)
+
         # # courson
         # courson =Courson(proxies=self.proxies, max_threads=2)
         # courson.collect_course_pages()
