@@ -3,6 +3,7 @@ from Modules.RealDiscount import RealDiscount
 from Modules.Courcevania import Coursevania
 from Modules.YoFreeSamples import YoFreeSamples
 from Modules.UdemyFreebies import UdemyFreebies
+from Modules.DiscUdemy import DiscUdemy
 from Modules.Courson import Courson
 import urllib3
 
