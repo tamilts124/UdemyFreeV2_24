@@ -3,19 +3,20 @@ name: Udemy course entroller
 on:
   push:
     branches: [ "main" ]
-    
+
   schedule:
-    #- cron: '*/60 * * * *'
+    # Uncomment and adjust as needed
+    # - cron: '*/60 * * * *'
 
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setting up Python
         uses: actions/setup-python@v4
         with:
@@ -25,23 +26,22 @@ jobs:
         run: | 
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
+
       # Step 1: Try to Restore the Cache
       - name: Restoring the Cache
         uses: actions/cache@v3
         with:
           path: encrypted_session.txt
-          key: session-cache-key
-
+          key: session-cache-${{ github.run_id }}
+          restore-keys: |
+            session-cache-
 
       - name: Running Script  
         env:
           SECURE_KEY: ${{secrets.SECURE_KEY}}
-          
           EMAIL: ${{secrets.EMAIL}}
           PASSWORD: ${{secrets.PASSWORD}}
           GMAIL_APP_PASSWORD: ${{secrets.GMAIL_APP_PASSWORD}}
-
           ACCESS_TOKEN: ${{secrets.ACCESS_TOKEN}}
           SESSION_ID: ${{secrets.SESSION_ID}}
           MYACCESSTOKENS: ${{secrets.MYACCESSTOKENS}}
@@ -53,7 +53,4 @@ jobs:
         uses: actions/cache@v3
         with:
           path: encrypted_session.txt
-          key: session-cache-key
-          # Ensure to forcefully save it if content changes
-          restore-keys: |
-            session-cache-key
+          key: session-cache-${{ github.run_id }}
