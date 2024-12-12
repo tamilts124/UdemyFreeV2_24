@@ -5,6 +5,7 @@ from Modules.YoFreeSamples import YoFreeSamples
 from Modules.UdemyFreebies import UdemyFreebies
 from Modules.DiscUdemy import DiscUdemy
 from Modules.CourseJoiner import CourseJoiner
+from Modules.InfoGnu import InfoGnu
 from Modules.Courson import Courson
 import urllib3
 
@@ -79,6 +80,15 @@ class CouponScraper:
             self.combineUniqueLinks(courseJoiner.coupons)
         except Exception as e:
             print("Course Joiner offers cant fetch. Error:", e)
+
+        # infognu
+        try:
+            infoGnu =InfoGnu(from_day+1, to_day)
+            infoGnu.collect_infognu_course_urls()
+            infoGnu.collect_courses(infoGnu.infognu_course_urls)
+            self.combineUniqueLinks(infoGnu.coupons)
+        except Exception as e:
+            print("Info Gnu offers cant fetch. Error:", e)
 
         # # courson
         # courson =Courson(proxies=self.proxies, max_threads=2)
