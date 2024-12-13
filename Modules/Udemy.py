@@ -95,7 +95,7 @@ class Udemy:
                 coupon_availablity =True
                 for accesstoken in self.myaccesstokens:
                     while True:
-                        result_page =requests.get(f'https://www.udemy.com/api-2.0/courses/{course_id}/subscriber-curriculum-items/', cookies={**self.cookies, 'access_token': accesstoken})
+                        result_page =requests.get(f'https://www.udemy.com/api-2.0/courses/{course_id}/subscriber-curriculum-items/', cookies={'access_token': accesstoken})
                         if result_page.status_code<500: break
                     if 'you do not have permission to perform this action.' not in result_page.text.lower():
                         coupon_availablity =False
