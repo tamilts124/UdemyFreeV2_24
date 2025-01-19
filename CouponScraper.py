@@ -106,7 +106,7 @@ class CouponScraper:
 
         # onlinecourses
         try:
-            onlineCourses =onlineCourses(from_day+1, to_day)
+            onlineCourses =OnlineCourses(from_day+1, to_day)
             onlineCourses.collect_onlinecourses_course_urls()
             onlineCourses.collect_courses(onlineCourses.onlinecourses_course_urls)
             self.combineUniqueLinks(onlineCourses.coupons)
