@@ -8,6 +8,10 @@ from Modules.CourseJoiner import CourseJoiner
 from Modules.InfoGnu import InfoGnu
 from Modules.CouponScorpion import CouponScorpion
 from Modules.Courson import Courson
+from Modules.OnlineCourses import OnlineCourses
+from Modules.CourseCouponClub import CourseCouponClub
+from Modules.ScrollCoupons import ScrollCoupons
+from Modules.OnlineTutorials import OnlineTutorials
 import urllib3
 
 urllib3.disable_warnings()
@@ -99,6 +103,43 @@ class CouponScraper:
             self.combineUniqueLinks(couponScorpion.coupons)
         except Exception as e:
             print("Coupon Scorpion offers cant fetch. Error:", e)
+
+        # onlinecourses
+        try:
+            onlineCourses =onlineCourses(from_day+1, to_day)
+            onlineCourses.collect_onlinecourses_course_urls()
+            onlineCourses.collect_courses(onlineCourses.onlinecourses_course_urls)
+            self.combineUniqueLinks(onlineCourses.coupons)
+        except Exception as e:
+            print("OnlineCourses offers cant fetch. Error:", e)
+
+
+        # course coupon club
+        try:
+            courseCouponClub =CourseCouponClub(from_day+1, to_day)
+            courseCouponClub.collect_coursecouponclub_course_urls()
+            courseCouponClub.collect_courses(courseCouponClub.coursecouponclub_course_urls)
+            self.combineUniqueLinks(courseCouponClub.coupons)
+        except Exception as e:
+            print("Course Coupon Club offers cant fetch. Error:", e)
+
+        # scroll coupons
+        try:
+            scrollCoupons =ScrollCoupons(from_day+1, to_day)
+            scrollCoupons.collect_scrollcoupons_course_urls()
+            scrollCoupons.collect_courses(scrollCoupons.scrollcoupons_course_urls)
+            self.combineUniqueLinks(scrollCoupons.coupons)
+        except Exception as e:
+            print("Scroll Coupons offers cant fetch. Error:", e)
+
+        # online tutorials
+        try:
+            onlineTutorials =OnlineTutorials(from_day+1, to_day)
+            onlineTutorials.collect_onlinetutorials_course_urls()
+            onlineTutorials.collect_courses(onlineTutorials.onlinetutorials_course_urls)
+            self.combineUniqueLinks(onlineTutorials.coupons)
+        except Exception as e:
+            print("Online Tutorials offers cant fetch. Error:", e)
 
         # # courson
         # courson =Courson(proxies=self.proxies, max_threads=2)
