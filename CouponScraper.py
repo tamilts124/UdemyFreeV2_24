@@ -12,6 +12,8 @@ from Modules.OnlineCourses import OnlineCourses
 from Modules.CourseCouponClub import CourseCouponClub
 from Modules.ScrollCoupons import ScrollCoupons
 from Modules.OnlineTutorials import OnlineTutorials
+from Modules.CursosDev import CursosDev
+from Modules.CouponsEagle import CouponsEagle
 import urllib3
 
 urllib3.disable_warnings()
@@ -140,6 +142,24 @@ class CouponScraper:
             self.combineUniqueLinks(onlineTutorials.coupons)
         except Exception as e:
             print("Online Tutorials offers cant fetch. Error:", e)
+
+        # Cursos Dev
+        try:
+            cursosDev =CursosDev(from_day+1, to_day)
+            cursosDev.collect_cursosdev_course_urls()
+            cursosDev.collect_courses(cursosDev.cursosdev_course_urls)
+            self.combineUniqueLinks(cursosDev.coupons)
+        except Exception as e:
+            print("Cursos Dev offers cant fetch. Error:", e)
+
+        # Coupons Eagle
+        try:
+            couponsEagle =CouponsEagle(from_day+1, to_day)
+            couponsEagle.collect_couponseagle_course_urls()
+            couponsEagle.collect_courses(couponsEagle.couponseagle_course_urls)
+            self.combineUniqueLinks(couponsEagle.coupons)
+        except Exception as e:
+            print("Coupons Eagle offers cant fetch. Error:", e)
 
         # # courson
         # courson =Courson(proxies=self.proxies, max_threads=2)
