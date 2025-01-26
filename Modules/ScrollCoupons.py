@@ -26,12 +26,13 @@ class ScrollCoupons:
             a_tags =div_tag.find_all('a')
 
             for a_tag in a_tags:
-                course_name =a_tag.text.strip('\n\t ')
+                course_name =a_tag.text.strip('\n\t\r ')
                 self.scrollcoupons_course_urls.append([course_name, a_tag['href']])
 
             self.from_day +=1
 
     def thread_scrollcoupons_coupons_through_url(self, offer):
+        print(offer)
         html_page =requests.get(offer[1]).text
         hmtl_page_soup =BeautifulSoup(html_page, 'html.parser')
 

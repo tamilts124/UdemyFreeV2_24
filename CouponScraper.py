@@ -98,13 +98,13 @@ class CouponScraper:
             print("Info Gnu offers cant fetch. Error:", e)
 
         # coupon scorpion
-        try:
-            couponScorpion =CouponScorpion(from_day+1, to_day)
-            couponScorpion.collect_couponscorpion_course_urls()
-            couponScorpion.collect_courses(couponScorpion.couponscorpion_course_urls)
-            self.combineUniqueLinks(couponScorpion.coupons)
-        except Exception as e:
-            print("Coupon Scorpion offers cant fetch. Error:", e)
+        # try:
+        #     couponScorpion =CouponScorpion(from_day+1, to_day)
+        #     couponScorpion.collect_couponscorpion_course_urls()
+        #     couponScorpion.collect_courses(couponScorpion.couponscorpion_course_urls)
+        #     self.combineUniqueLinks(couponScorpion.coupons)
+        # except Exception as e:
+        #     print("Coupon Scorpion offers cant fetch. Error:", e)
 
         # onlinecourses
         try:

@@ -33,17 +33,29 @@ class CouponScorpion:
 
     def thread_couponscorpion_coupons_through_url(self, offer):
         html_page =requests.get(offer[1], headers=self.headers).text
-        sf_offer_url =re.findall("var sf_offer_url = '.*';", html_page)
-        sf_offer_url =re.findall('.*', sf_offer_url[0])[0].split("'")[1]
 
-        data =f"go={sf_offer_url}&a={0}"
-        url_data =unquote(data)
-        url =self.base_url+'/scripts/udemy/out.php?'+url_data
+        # old method
 
-        response_headers =requests.get(url, headers=self.headers, allow_redirects=False).headers
+        # sf_offer_url =re.findall("var sf_offer_url = '.*';", html_page)
+        # sf_offer_url =re.findall('.*', sf_offer_url[0])[0].split("'")[1]
 
-        if response_headers['location'].startswith('https://www.udemy.com/'):
-            self.coupons.append([offer[0], response_headers['location']])
+        # data =f"go={sf_offer_url}&a={0}"
+        # url_data =unquote(data)
+        # url =self.base_url+'/scripts/udemy/out.php?'+url_data
+
+        # new update
+        html_page_soup =BeautifulSoup(html_page, 'html.parser')
+        a_tags =html_page_soup.find_all('a', {'class': 're_track_btn'})
+
+        for a_tag in a_tags:
+            if 'GET COUPON CODE' in a_tag.text.strip('\n\t\r '):
+                url =a_tag['href']
+                print(url)
+                response_headers =requests.get(url, headers=self.headers, allow_redirects=False).headers
+
+                if response_headers['location'].startswith('https://www.udemy.com/'):
+                    self.coupons.append([offer[0], response_headers['location']])
+                    break
         else:
             self.unwanted_links.append(offer)
 
