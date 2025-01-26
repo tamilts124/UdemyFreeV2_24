@@ -4,9 +4,9 @@ on:
   push:
     branches: [ "main" ]
 
-  schedule:
+  # schedule:
     # Uncomment and adjust as needed
-    - cron: '*/60 * * * *'
+    # - cron: '*/60 * * * *'
 
   workflow_dispatch:
 
