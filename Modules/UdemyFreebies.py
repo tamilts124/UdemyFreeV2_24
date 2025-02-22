@@ -27,9 +27,17 @@ class UdemyFreebies:
             self.from_page +=1
 
     def thread_udemy_location_fetch_from_url(self, offer_name, offer_link):
-        freebies_response_header =requests.get(offer_link, allow_redirects=False).headers
-        self.coupons.append([offer_name, freebies_response_header['location']])
-        self.threads -=1
+        while True:
+            try:
+                print(offer_name)
+                freebies_response_header =requests.get(offer_link, allow_redirects=False).headers
+                if freebies_response_header.get('location'):
+                    self.coupons.append([offer_name, freebies_response_header['location']])
+                else: continue
+            except Exception:
+                self.waste_coupons.append([offer_name, offer_link])
+            self.threads -=1
+            break
 
     def collect_coupons(self, freebies_links:list):
 
@@ -40,7 +48,7 @@ class UdemyFreebies:
             self.threads+=1
             Thread(target=self.thread_udemy_location_fetch_from_url, args=[freebies_link[0], offer_link]).start()
         
-        while len(self.coupons)!=len(self.freebies_course_links): pass
+        while len(self.coupons)+len(self.waste_coupons)!=len(self.freebies_course_links): pass
 
 
 if __name__ == '__main__':
