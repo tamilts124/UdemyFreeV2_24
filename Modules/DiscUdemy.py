@@ -32,7 +32,12 @@ class DiscUdemy:
     def thread_disudemy_coupons_through_url(self, offer):
         partial_course_url = offer[1].split(self.base_url)[-1].split('/')[-1]
         disudemy_link =self.base_url+'/go/'+partial_course_url
-        html_page =requests.get(disudemy_link).text
+        html_page =None
+        while not html_page:
+            try:
+                html_page =requests.get(disudemy_link).text
+            except Exception: continue
+
         hmtl_page_soup =BeautifulSoup(html_page, 'html.parser')
 
         a_tags =hmtl_page_soup.find_all('a')
