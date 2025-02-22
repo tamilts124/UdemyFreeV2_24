@@ -45,8 +45,13 @@ def submit_otp(otp:int)->list:
     otp_field.send_keys(otp)
     sleep(1)
 
-    div_element =driver.find_element(By.CLASS_NAME, 'auth-form-row--small--Byo8R')
-    login_button =div_element.find_element(By.TAG_NAME, 'button')
+    # div_element =driver.find_element(By.CLASS_NAME, 'auth-form-row--small--Byo8R')
+    buttons =driver.find_elements(By.TAG_NAME, 'button')
+    for button in buttons:
+        span =button.find_element(By.TAG_NAME, 'span')
+        if span and span.text.strip('\n\t ').lower() == 'log in':
+            login_button =button
+            break
     login_button.click()
     sleep(10)
 
