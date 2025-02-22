@@ -48,7 +48,10 @@ def submit_otp(otp:int)->list:
     # div_element =driver.find_element(By.CLASS_NAME, 'auth-form-row--small--Byo8R')
     buttons =driver.find_elements(By.TAG_NAME, 'button')
     for button in buttons:
-        span =button.find_element(By.TAG_NAME, 'span')
+        span =None
+        try:
+            span =button.find_element(By.TAG_NAME, 'span')
+        except Exception: continue
         if span and span.text.strip('\n\t ').lower() == 'log in':
             login_button =button
             break
@@ -63,3 +66,5 @@ def submit_otp(otp:int)->list:
     return cookies
 
 
+# launch_udemy_login("test@gmail.com", "4546546456")
+# submit_otp('564567')
