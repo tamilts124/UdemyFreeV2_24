@@ -182,7 +182,7 @@ class CouponScraper:
         # courson.collect_course_pages()
         # courson.collect_coupons_by_course_pages(courson.course_pages)
         # self.combineUniqueLinks(courson.coupons)
-        print()
+        print('\n')
 
 
 

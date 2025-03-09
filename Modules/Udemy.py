@@ -71,7 +71,7 @@ class Udemy:
         self.cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid}
         course_title =coupon_data[0]
         course_name =coupon_data[1].split('/')[-2]
-        coupon_code =coupon_data[1].split('=')[-1]
+        coupon_code =coupon_data[1].split('couponCode=')[-1].split('&')[0]
         course_id, result_json, tries =None, None, 10
         while True:
             try:

@@ -29,7 +29,6 @@ class UdemyFreebies:
     def thread_udemy_location_fetch_from_url(self, offer_name, offer_link):
         while True:
             try:
-                print(offer_name)
                 freebies_response_header =requests.get(offer_link, allow_redirects=False).headers
                 if freebies_response_header.get('location'):
                     self.coupons.append([offer_name, freebies_response_header['location']])
