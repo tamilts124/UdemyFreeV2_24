@@ -140,7 +140,7 @@ class Udemy:
             result_page =requests.post('https://www.udemy.com/payment/checkout-submit/', headers={'Content-Type': 'application/json'}, cookies=self.cookies, data=json.dumps(common_data))
             result_json =result_page.json()            
 
-            # print(result_json)
+            print(result_json)
             if result_json.get('status', '')=='succeeded': return True
             elif 'You do not have permission to perform this action' in result_json.get('detail', ''):
                     raise Exception('Enroll Fail, Session id or Access Token is Expired...\n')
