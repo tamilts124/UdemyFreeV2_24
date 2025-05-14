@@ -41,7 +41,7 @@ def launch_udemy_login(email: str, password: str)->[bool, list]:
         return [False, []]
 
 def submit_otp(otp:int)->list:
-    otp_field =driver.find_element(By.CSS_SELECTOR, 'input[placeholder="6-digit code"]')
+    otp_field =driver.find_element(By.CSS_SELECTOR, 'input[maxlength="6"]')
     otp_field.send_keys(otp)
     sleep(1)
 
