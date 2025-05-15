@@ -32,37 +32,41 @@ class CourseJoiner:
             self.from_day +=1
 
     def thread_coursejoiner_coupons_through_url(self, offer):
-        html_page =requests.get(offer[1]).text
-        hmtl_page_soup =BeautifulSoup(html_page, 'html.parser')
+        try:
+            html_page =requests.get(offer[1]).text
+            hmtl_page_soup =BeautifulSoup(html_page, 'html.parser')
 
-        a_tags =hmtl_page_soup.find_all('a')
+            a_tags =hmtl_page_soup.find_all('a')
 
-        for a_tag in a_tags:
-            coupon_shortern_link =a_tag['href']
+            for a_tag in a_tags:
+                coupon_shortern_link =a_tag['href']
 
-            if a_tag.text=='APPLY HERE':
-                response =requests.get(coupon_shortern_link, allow_redirects=False)
-                response_headers =response.headers
-                coupon_shortern_link =response_headers.get('location')
+                if a_tag.text=='APPLY HERE':
+                    response =requests.get(coupon_shortern_link, allow_redirects=False)
+                    response_headers =response.headers
+                    coupon_shortern_link =response_headers.get('location')
 
-                response =requests.get(coupon_shortern_link, allow_redirects=False)
-                redirect_page_soup =BeautifulSoup(response.text, 'html.parser')
-                span_tag =redirect_page_soup.find('span', {'id': 'url'})
-                coupon_shortern_link =span_tag.text
-                # print(coupon_shortern_link)
-                
-                response =requests.get(coupon_shortern_link, allow_redirects=False)
-                response_headers =response.headers
-                location =response_headers.get('location')
-                if location and location.startswith('https://www.udemy.com/'):
-                    self.coupons.append([offer[0], location])
-                else:
-                    self.unwanted_links.append(offer)        
-                break
-        else:
+                    response =requests.get(coupon_shortern_link, allow_redirects=False)
+                    redirect_page_soup =BeautifulSoup(response.text, 'html.parser')
+                    span_tag =redirect_page_soup.find('span', {'id': 'url'})
+                    coupon_shortern_link =span_tag.text
+                    # print(coupon_shortern_link)
+                    
+                    response =requests.get(coupon_shortern_link, allow_redirects=False)
+                    response_headers =response.headers
+                    location =response_headers.get('location')
+                    if location and location.startswith('https://www.udemy.com/'):
+                        self.coupons.append([offer[0], location])
+                    else:
+                        self.unwanted_links.append(offer)        
+                    break
+            else:
+                self.unwanted_links.append(offer)
+
+            self.threads -=1
+        except Exception as e:
+            print('Error occured in Course Joiner:', e)
             self.unwanted_links.append(offer)
-
-        self.threads -=1
 
     def collect_courses(self, course_joiner_urls):
         
