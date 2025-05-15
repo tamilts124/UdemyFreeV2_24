@@ -42,19 +42,23 @@ class CourseJoiner:
                 coupon_shortern_link =a_tag['href']
 
                 if a_tag.text=='APPLY HERE':
-                    response =requests.get(coupon_shortern_link, allow_redirects=False)
-                    response_headers =response.headers
-                    coupon_shortern_link =response_headers.get('location')
+                    """ currently the shortner is not there so i have commented """
+                    # response =requests.get(coupon_shortern_link, allow_redirects=False)
+                    # response_headers =response.headers
+                    # coupon_shortern_link =response_headers.get('location')
 
-                    response =requests.get(coupon_shortern_link, allow_redirects=False)
-                    redirect_page_soup =BeautifulSoup(response.text, 'html.parser')
-                    span_tag =redirect_page_soup.find('span', {'id': 'url'})
-                    coupon_shortern_link =span_tag.text
-                    # print(coupon_shortern_link)
+                    # response =requests.get(coupon_shortern_link, allow_redirects=False)
+                    # redirect_page_soup =BeautifulSoup(response.text, 'html.parser')
+                    # span_tag =redirect_page_soup.find('span', {'id': 'url'})
+                    # coupon_shortern_link =span_tag.text
+                    # # print(coupon_shortern_link)
                     
-                    response =requests.get(coupon_shortern_link, allow_redirects=False)
-                    response_headers =response.headers
-                    location =response_headers.get('location')
+                    # response =requests.get(coupon_shortern_link, allow_redirects=False)
+                    # response_headers =response.headers
+                    # location =response_headers.get('location')
+                    
+                    location =coupon_shortern_link
+
                     if location and location.startswith('https://www.udemy.com/'):
                         self.coupons.append([offer[0], location])
                     else:
@@ -67,9 +71,9 @@ class CourseJoiner:
         except Exception as e:
             print('Error occured in Course Joiner:', e)
             self.unwanted_links.append(offer)
+            self.threads -=1
 
     def collect_courses(self, course_joiner_urls):
-        
         for course_joiner_url in course_joiner_urls:
             while self.threads >=self.mthreads: sleep(0.2)
             self.threads +=1
