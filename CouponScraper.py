@@ -36,26 +36,29 @@ class CouponScraper:
         # self.proxies =proxyScraper.good_proxies
         # print("Working proxies:", len(self.proxies))
 
+        # issues there to fix
+        
         # real discount
-        try:
-            real_discount =RealDiscount()
-            real_discount.get_articles_link()
-            real_discount.get_offerslink_by_articleslink(real_discount.articles_link[from_day:to_day])
-            real_discount.collectcoupons_by_offerslink(real_discount.offers_link)
-            print('Real Discount:', len(real_discount.coupons))
-            self.combineUniqueLinks(real_discount.coupons)
-        except Exception as e:
-            print("Real discount offers cant fetch. Error:", e)
+        # try:
+        #     real_discount =RealDiscount()
+        #     real_discount.get_articles_link()
+        #     real_discount.get_offerslink_by_articleslink(real_discount.articles_link[from_day:to_day])
+        #     real_discount.collectcoupons_by_offerslink(real_discount.offers_link)
+        #     print('Real Discount:', len(real_discount.coupons))
+        #     self.combineUniqueLinks(real_discount.coupons)
+        # except Exception as e:
+        #     print("Real discount offers cant fetch. Error:", e)
 
+        # issues there to fix
         # coursevania
-        try:
-            coursevania =Coursevania()
-            coursevania.get_home_page_offerslink(from_day, to_day)
-            coursevania.get_coupons_by_offerslink(coursevania.offers_link)
-            print('Coursevania:', len(coursevania.coupons))
-            self.combineUniqueLinks(coursevania.coupons)
-        except Exception as e:
-            print("Coursevania offers cant fetch. Error:", e)
+        # try:
+        #     coursevania =Coursevania()
+        #     coursevania.get_home_page_offerslink(from_day, to_day)
+        #     coursevania.get_coupons_by_offerslink(coursevania.offers_link)
+        #     print('Coursevania:', len(coursevania.coupons))
+        #     self.combineUniqueLinks(coursevania.coupons)
+        # except Exception as e:
+        #     print("Coursevania offers cant fetch. Error:", e)
 
         # yofreesamples
         try:
@@ -108,13 +111,13 @@ class CouponScraper:
             print("Info Gnu offers cant fetch. Error:", e)
 
         # coupon scorpion
-        # try:
-        #     couponScorpion =CouponScorpion(from_day+1, to_day)
-        #     couponScorpion.collect_couponscorpion_course_urls()
-        #     couponScorpion.collect_courses(couponScorpion.couponscorpion_course_urls)
-        #     self.combineUniqueLinks(couponScorpion.coupons)
-        # except Exception as e:
-        #     print("Coupon Scorpion offers cant fetch. Error:", e)
+        try:
+            couponScorpion =CouponScorpion(from_day+1, to_day)
+            couponScorpion.collect_couponscorpion_course_urls()
+            couponScorpion.collect_courses(couponScorpion.couponscorpion_course_urls)
+            self.combineUniqueLinks(couponScorpion.coupons)
+        except Exception as e:
+            print("Coupon Scorpion offers cant fetch. Error:", e)
 
         # onlinecourses
         try:
@@ -177,11 +180,13 @@ class CouponScraper:
         except Exception as e:
             print("Coupons Eagle offers cant fetch. Error:", e)
 
-        # # courson
+        # issues there to fix
+        # courson
         # courson =Courson(proxies=self.proxies, max_threads=2)
         # courson.collect_course_pages()
         # courson.collect_coupons_by_course_pages(courson.course_pages)
         # self.combineUniqueLinks(courson.coupons)
+
         print('\n')
 
 

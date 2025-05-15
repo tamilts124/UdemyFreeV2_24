@@ -128,7 +128,8 @@ class Udemy:
 
     def enroll_courses(self, courses_cart:list):
         try:
-            self.cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid}
+            
+            # self.cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid}
 
             common_data ={
                 "checkout_environment":"Marketplace",

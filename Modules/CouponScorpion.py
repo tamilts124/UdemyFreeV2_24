@@ -51,7 +51,7 @@ class CouponScorpion:
             if 'GET COUPON CODE' in a_tag.text.strip('\n\t\r '):
                 url =a_tag['href']
                 response_headers =requests.get(url, headers=self.headers, allow_redirects=False).headers
-                print(response_headers['location'])
+                # print(response_headers['location'])
 
                 if response_headers['location'].startswith('https://www.udemy.com/'):
                     self.coupons.append([offer[0], response_headers['location']])

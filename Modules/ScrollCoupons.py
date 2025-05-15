@@ -59,6 +59,7 @@ class ScrollCoupons:
         while len(self.scrollcoupons_course_urls)>len(self.coupons)+len(self.unwanted_links): sleep(0.2)
 
 if __name__ == '__main__':
+    # in live its working, only local not working
     scrollCoupons =ScrollCoupons(1, 1)
     scrollCoupons.collect_scrollcoupons_course_urls()
     scrollCoupons.collect_courses(scrollCoupons.scrollcoupons_course_urls)
