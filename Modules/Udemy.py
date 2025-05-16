@@ -68,7 +68,7 @@ class Udemy:
         }
     
     def thread_check_coupon_and_addcart(self, coupon_data:list):
-        self.cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid}
+        cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid}
         course_title =coupon_data[0]
         course_name =coupon_data[1].split('/')[-2]
         coupon_code =coupon_data[1].split('couponCode=')[-1].split('&')[0]
@@ -88,7 +88,7 @@ class Udemy:
         if result_json and result_json.get('uses_remaining', ''):
             # print('remaining uses:', result_json.get('uses_remaining', ''))
             while True:
-                result_page =requests.get(f'https://www.udemy.com/api-2.0/courses/{course_id}/subscriber-curriculum-items/', cookies=self.cookies)
+                result_page =requests.get(f'https://www.udemy.com/api-2.0/courses/{course_id}/subscriber-curriculum-items/', cookies=cookies)
                 if result_page.status_code<500: break
             if 'you do not have permission to perform this action.' in result_page.text.lower():
                 # print(course_id, result_page.text, result_page.status_code)
