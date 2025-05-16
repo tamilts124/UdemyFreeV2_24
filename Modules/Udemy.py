@@ -129,7 +129,8 @@ class Udemy:
     def enroll_courses(self, courses_cart:list):
         try:
             
-            # self.cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid}
+            # cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid, 'client_id': self.cookies['client_id']}
+            cookies={'access_token': self.accesstoken, 'client_id': self.cookies['client_id']}
 
             common_data ={
                 "checkout_environment":"Marketplace",
@@ -138,7 +139,7 @@ class Udemy:
                 "payment_info":{"method_id":"0","payment_vendor":"Free","payment_method":"free-method"}
             }
             # if os.environ.get('CF_CLEARANCE'): cookies['cf_clearance'] =os.environ['CF_CLEARANCE']
-            result_page =requests.post('https://www.udemy.com/payment/checkout-submit/', headers={'Content-Type': 'application/json'}, cookies=self.cookies, data=json.dumps(common_data))
+            result_page =requests.post('https://www.udemy.com/payment/checkout-submit/', headers={'Content-Type': 'application/json'}, cookies=cookies, data=json.dumps(common_data))
             result_json =result_page.json()            
 
             print(result_json)
