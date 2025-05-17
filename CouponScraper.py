@@ -36,18 +36,15 @@ class CouponScraper:
         # self.proxies =proxyScraper.good_proxies
         # print("Working proxies:", len(self.proxies))
 
-        # issues there to fix
         
         # real discount
-        # try:
-        #     real_discount =RealDiscount()
-        #     real_discount.get_articles_link()
-        #     real_discount.get_offerslink_by_articleslink(real_discount.articles_link[from_day:to_day])
-        #     real_discount.collectcoupons_by_offerslink(real_discount.offers_link)
-        #     print('Real Discount:', len(real_discount.coupons))
-        #     self.combineUniqueLinks(real_discount.coupons)
-        # except Exception as e:
-        #     print("Real discount offers cant fetch. Error:", e)
+        try:
+            realDiscount =RealDiscount(from_day+1, to_day)
+            realDiscount.collect_coupons()
+            print('Real Discount:', len(realDiscount.coupons))
+            self.combineUniqueLinks(realDiscount.coupons)
+        except Exception as e:
+            print("Real discount offers cant fetch. Error:", e)
 
         # issues there to fix
         # coursevania
