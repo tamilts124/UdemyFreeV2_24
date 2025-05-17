@@ -27,7 +27,7 @@ class Coursevania:
 
     def get_home_page_offerslink(self, from_page:int, to_page:int):
         for index in range(from_page, to_page):
-            home_page =requests.get(f"https://coursevania.com/wp-admin/admin-ajax.php?offset={index}"+r"&args={%22image_size%22:%22250x250%22,%22per_row%22:%224%22,%22posts_per_page%22:%2212%22,%22class%22:%22archive_grid%22}&action=stm_lms_load_content"+f"&nonce={self.nonces['load_content']}&sort=date_high").json()
+            home_page =requests.get(f"https://coursevania.com/wp-admin/admin-ajax.php?offset={index}"+r"&args={%22image_size%22:%22250x250%22,%22per_row%22:%224%22,%22posts_per_page%22:%2212%22,%22class%22:%22archive_grid%22}&action=stm_lms_load_content"+f"&nonce={self.nonces.get('load_content')}&sort=date_high").json()
             course_cards =BeautifulSoup(home_page['content'], 'html.parser').findAll('div', {'class': 'stm_lms_courses__single'})
             for card in course_cards:
                 h5_tag =card.find('h5')
