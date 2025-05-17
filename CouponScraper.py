@@ -14,6 +14,7 @@ from Modules.ScrollCoupons import ScrollCoupons
 from Modules.OnlineTutorials import OnlineTutorials
 from Modules.CursosDev import CursosDev
 from Modules.CouponsEagle import CouponsEagle
+from Modules.Comidoc import Comidoc
 import urllib3
 
 urllib3.disable_warnings()
@@ -185,6 +186,15 @@ class CouponScraper:
             self.combineUniqueLinks(courson.coupons)
         except Exception as e:
             print("Courson offers cant fetch. Error:", e)
+
+        # Comidoc
+        try:
+            comidoc =Comidoc()
+            comidoc.collect_coupons()
+            print('Comidoc:', len(comidoc.coupons))
+            self.combineUniqueLinks(comidoc.coupons)
+        except Exception as e:
+            print("Comidoc offers cant fetch. Error:", e)
 
         print('\n')
 
