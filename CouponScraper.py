@@ -115,6 +115,7 @@ class CouponScraper:
             couponScorpion =CouponScorpion(from_day+1, to_day)
             couponScorpion.collect_couponscorpion_course_urls()
             couponScorpion.collect_courses(couponScorpion.couponscorpion_course_urls)
+            print('Coupon Scorpion:', len(couponScorpion.coupons))
             self.combineUniqueLinks(couponScorpion.coupons)
         except Exception as e:
             print("Coupon Scorpion offers cant fetch. Error:", e)
@@ -124,10 +125,10 @@ class CouponScraper:
             onlineCourses =OnlineCourses(from_day+1, to_day)
             onlineCourses.collect_onlinecourses_course_urls()
             onlineCourses.collect_courses(onlineCourses.onlinecourses_course_urls)
-            print('OnlineCourses:', len(onlineCourses.coupons))
+            print('Online Courses:', len(onlineCourses.coupons))
             self.combineUniqueLinks(onlineCourses.coupons)
         except Exception as e:
-            print("OnlineCourses offers cant fetch. Error:", e)
+            print("Online Courses offers cant fetch. Error:", e)
 
 
         # course coupon club

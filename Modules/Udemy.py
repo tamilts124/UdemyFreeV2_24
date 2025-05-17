@@ -12,6 +12,7 @@ class Udemy:
     def __init__(self, accesstoken:str='', sessionid:str='', myaccesstokens:list=[], max_threads:int=50) -> None:
         self.max_threads =max_threads
         self.threads =0
+        self.tries =3
 
         self.accesstoken =accesstoken
         self.sessionid =sessionid
@@ -54,37 +55,43 @@ class Udemy:
                         for data in datas:
                             if '.jpg' in data:
                                 datas =data.split('_')
-                                return int(datas[0])
+                                if str(datas[0].strip('\n\t ')).isnumeric():
+                                    print(int(datas[0]))
+                                    return int(datas[0])
     
     def get_coupon_status(self, course_id:int, coupon:str):
-        json_data =requests.get(f'https://www.udemy.com/api-2.0/course-landing-components/{course_id}/me/?components=purchase,redeem_coupon,discount_expiration&discountCode={coupon}')
-        json_data =json_data.json()
-        if not json_data.get('redeem_coupon'): return
-        status =json_data['redeem_coupon']['discount_attempts'][0]['status']
-        if status=='applied':return {
-            'uses_remaining':json_data['purchase']['data']['pricing_result']['campaign']['uses_remaining'],
-            'real_price':json_data['purchase']['data']['pricing_result']['list_price']['amount'],
-            'end_time':[json_data['discount_expiration']['data']['discount_deadline_text'] if json_data.get('discount_expiration') else ''][0]
-        }
+        try:
+            json_data =requests.get(f'https://www.udemy.com/api-2.0/course-landing-components/{course_id}/me/?components=purchase,redeem_coupon,discount_expiration&discountCode={coupon}', verify=False, allow_redirects=False)
+            json_data =json_data.json()
+            if not json_data.get('redeem_coupon'): return
+            status =json_data['redeem_coupon']['discount_attempts'][0]['status']
+            if status=='applied':return {
+                'uses_remaining':json_data['purchase']['data']['pricing_result']['campaign']['uses_remaining'],
+                'real_price':json_data['purchase']['data']['pricing_result']['list_price']['amount'],
+                'end_time':[json_data['discount_expiration']['data']['discount_deadline_text'] if json_data.get('discount_expiration') else ''][0]
+            }
+        except Exception as e:
+            print('Error occured (while getting coupon status):', e)
     
     def thread_check_coupon_and_addcart(self, coupon_data:list):
         cookies={'access_token': self.accesstoken, 'dj_session_id': self.sessionid}
         course_title =coupon_data[0]
         course_name =coupon_data[1].split('/')[-2]
         coupon_code =coupon_data[1].split('couponCode=')[-1].split('&')[0]
-        course_id, result_json, tries =None, None, 10
+        course_id, result_json, tries =None, None, self.tries
         while True:
             try:
                 course_page =requests.get(coupon_data[1])
                 if not course_id: course_id =self.get_courseid_by_course_pagedata(course_page.text)
-                if not result_json: result_json =self.get_coupon_status(course_id, coupon_code)
+                if not result_json and course_id: result_json =self.get_coupon_status(course_id, coupon_code)
                 if course_id: break
                 tries -=1
                 # this course no longer allowed to enroll means, should break
                 if course_page.status_code==302 or tries<=0: break
             except Exception as e:
-                print(e, 'Udemy Prevention Detected.', )
-                pass
+                print('Error course and coupon:', course_name, coupon_code)
+                print('Udemy Prevention Detected.', e)
+
         if result_json and result_json.get('uses_remaining', ''):
             # print('remaining uses:', result_json.get('uses_remaining', ''))
             while True:
