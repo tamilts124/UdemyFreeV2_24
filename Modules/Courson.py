@@ -18,7 +18,7 @@ class Courson:
 			json_data =requests.post(self.base_url+'/load-more-coupons', json={"filters":{},"offset":30*self.from_day-1}).json()
 			items =json_data.get('coupons', [])
 			for item in items:
-				coupon =f'https://www.udemy.com/course/{item.get('id_name')}/?couponCode={item.get('coupon_code')}'
+				coupon =f"https://www.udemy.com/course/{item.get('id_name')}/?couponCode={item.get('coupon_code')}"
 				self.coupons.append([item.get('title'), coupon])
 			self.from_day +=1
 
